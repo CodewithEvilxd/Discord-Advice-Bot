@@ -1,8 +1,29 @@
 const { Client, GatewayIntentBits, IntentsBitField, Collection } = require('discord.js');
 const fs = require('fs');
 const path = require('path');
+const express = require('express');
 const config = require('./src/utils/config');
 const logger = require('./src/utils/logger');
+
+// Simple HTTP server for Render (health check)
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+app.get('/', (req, res) => {
+  res.json({
+    status: 'Bot is running',
+    uptime: process.uptime(),
+    timestamp: new Date().toISOString()
+  });
+});
+
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'OK', message: 'Discord Advice Bot is healthy' });
+});
+
+app.listen(PORT, () => {
+  logger.info(`Health check server running on port ${PORT}`);
+});
 
 const client = new Client({
   intents: [
